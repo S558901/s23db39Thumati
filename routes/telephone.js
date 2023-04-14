@@ -14,3 +14,6 @@ var router = express.Router();
 /* GET telephone */
 router.get('/', telephone_controlers.telephone_view_all_Page );
 module.exports = router;
+
+// GET request for one telephone.
+router.get('/telephone/:id', telephone_controlers.telephone_detail);
