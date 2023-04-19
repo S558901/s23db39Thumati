@@ -1,6 +1,6 @@
 const mongoose = require("mongoose")
 const telephoneSchema = mongoose.Schema({
-telephone_type: String,
+telephone: String,
 size: String,
 cost: Number
 })

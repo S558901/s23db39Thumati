@@ -17,3 +17,15 @@ module.exports = router;
 
 // GET request for one telephone.
 router.get('/telephone/:id', telephone_controlers.telephone_detail);
+
+/* GET detail telephone page */
+router.get('/detail', telephone_controlers.telephone_view_one_Page);
+
+/* GET create telephone page */
+router.get('/create', telephone_controlers.telephone_create_Page);
+
+/* GET create update page */
+router.get('/update', telephone_controlers.telephone_update_Page);
+
+// * GET delete telephone page */
+router.get('/delete', telephone_controlers.telephone_delete_Page);
