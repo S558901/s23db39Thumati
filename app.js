@@ -4,28 +4,14 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-require('dotenv').config();
-const connectionString =
-process.env.MONGO_CON
-mongoose = require('mongoose');
-mongoose.connect(connectionString,
-{useNewUrlParser: true,
-useUnifiedTopology: true});
 
-//Get the default connection
-var db = mongoose.connection;
-//Bind connection to error event
-db.on('error', console.error.bind(console, 'MongoDB connectionerror:'));
-db.once("open", function(){
-console.log("Connection to DB succeeded")})
-
-var telephone = require("./models/telephone");
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-var telephoneRouter = require('./routes/telephone');
+var ballRouter = require('./routes/telephone');
 var boardRouter = require('./routes/board');
-var selectorRouter = require('./routes/selector');
+var selectRouter=require('./routes/selector');
+var telephone = require("./models/telephone");
 var resourceRouter = require('./routes/resource');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
@@ -44,6 +30,7 @@ passport.use(new LocalStrategy(
   });
   }))
 
+
 var app = express();
 
 // view engine setup
@@ -54,14 +41,6 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
-app.use('/telephone', telephoneRouter);
-app.use('/board', boardRouter);
-app.use('/selector', selectorRouter);
-app.use('/resource', resourceRouter);
 app.use(require('express-session')({
   secret: 'keyboard cat',
   resave: false,
@@ -69,35 +48,25 @@ app.use(require('express-session')({
   }));
   app.use(passport.initialize());
   app.use(passport.session());
+app.use(express.static(path.join(__dirname, 'public')));
 
-async function recreateDB(){
-  // Delete everything
-  await telephone.deleteMany();
-  let instance1 = new telephone({telephone: "highend", size: "large", cost: 300});
-  
-  instance1.save().then( function(err,doc) {
-  if(err) return console.error(err);
-  console.log("First object saved")
-  });
- 
- let instance2 = new telephone({telephone: "basic", size: "med", cost: 200});
-  
-  instance2.save().then( function(err,doc) {
-  if(err) return console.error(err);
-  console.log("Second object saved")
-  });
- 
- let instance3 = new telephone({telephone: "compact", size: "small", cost: 600});
-  
-  instance3.save().then( function(err,doc) {
-  if(err) return console.error(err);
-  console.log("Third object saved")
-  });
-}
- let reseed = true;
- if (reseed) { recreateDB();}
+app.use('/', indexRouter);
+app.use('/users', usersRouter);
+app.use('/telephone', ballRouter);
+app.use('/board',boardRouter);
+app.use('/selector', selectRouter);
+app.use('/resource', resourceRouter);
 
- // passport config
+
+require('dotenv').config();
+const connectionString =
+process.env.MONGO_CON
+mongoose = require('mongoose');
+mongoose.connect(connectionString,
+{useNewUrlParser: true,
+useUnifiedTopology: true});
+
+// passport config
 // Use the existing connection
 // The Account model
 var Account =require('./models/account');
@@ -120,5 +89,47 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+//Get the default connection
+var db = mongoose.connection;
+//Bind connection to error event
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+db.once("open", function(){
+console.log("Connection to DB succeeded")});
+
+// We can seed the collection if needed on server start
+async function recreateDB(){
+ // Delete everything
+ await telephone.deleteMany();
+ let instance1 = new
+telephone({ball_name:"Cricket", ball_shape:'small',
+ball_radius:10});
+await instance1.save();
+//  instance1.save( function(err,doc) {
+//  if(err) return console.error(err);
+ console.log("First object saved")
+//  });
+let instance2 = new
+telephone({ball_name:"rugby", ball_shape:'medium',
+ball_radius:20});
+await instance2.save();
+//  instance1.save( function(err,doc) {
+//  if(err) return console.error(err);
+ console.log("second object saved")
+//  });
+
+let instance3 = new
+telephone({ball_name:"volleyball", ball_shape:'large',
+ball_radius:30});
+await instance3.save();
+//  instance1.save( function(err,doc) {
+//  if(err) return console.error(err);
+ console.log("third object saved")
+//  });
+
+}
+let reseed = true;
+if (reseed) { recreateDB();}
+
 
 module.exports = app;
